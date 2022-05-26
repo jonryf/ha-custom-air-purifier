@@ -220,11 +220,4 @@ class BlueairAirPurifier(HumidifierEntity):
     self._mode = mode
     self._attr_mode = mode
 
-
-  def available_modes(self) -> list[str] or None:
-    """Return a list of available modes.
-    Requires HumidifierEntityFeature.MODES.
-    """
-    return ["MODE_NORMAL", "MODE_BOOST", "MODE_AUTO", "MODE_SLEEP"]
-
   ############################################################
