@@ -109,9 +109,9 @@ class BlueairAirPurifier(HumidifierEntity):
 
     self._stop_delta = stop_delta
     
-    self._available_modes = ["MODE_NORMAL", "MODE_BOOST", "MODE_AUTO", "MODE_SLEEP"]
-    self._attr_mode = "MODE_AUTO"
-    self._mode = "MODE_AUTO"
+    self._available_modes = AVAILABLE_MODES
+    self._attr_mode = MODE_AUTO
+    self._mode = MODE_AUTO
 
     self._supported_features = HumidifierEntityFeature.MODES
 
