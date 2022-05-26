@@ -3,5 +3,5 @@
   "name": "Blueair Air Purifier",
   "requirements": [],
   "codeowners": ["jonryf"],
-  "version": "1.0.0.0"
+  "version": "1.0.0.1"
 }

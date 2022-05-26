@@ -138,7 +138,6 @@ class BlueairAirPurifier(HumidifierEntity):
 
   def update(self):
     """Update called periodically"""
-    self._update_switch() 
 
   @property
   def name(self):
@@ -185,12 +184,10 @@ class BlueairAirPurifier(HumidifierEntity):
     """Turn the device ON."""
     _LOGGER.debug('turn_on')
     self._is_on = True
-    self._update_switch()
 
   def turn_off(self, **kwargs):
     """Turn the device OFF."""
     _LOGGER.debug('turn_off')
     self._is_on = False
-    self._update_switch()
 
   ############################################################
