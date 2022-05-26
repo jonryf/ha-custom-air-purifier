@@ -29,6 +29,11 @@ from homeassistant.const import (
 )
 
 import homeassistant.helpers.config_validation as cv
+from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL
+
+AVAILABLE_MODES = [MODE_NORMAL, MODE_AUTO]
+
+SUPPORTED_FEATURES = SUPPORT_MODES
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -88,6 +93,9 @@ class BlueairAirPurifier(HumidifierEntity):
 	
   def __init__(self, name, device_class, start_delta, stop_delta):
     """Initialize the humidifier."""
+
+    self._attr_available_modes = AVAILABLE_MODES
+    self._attr_supported_features = SUPPORT_MODES
 
     self._humidity = DEFAULT_HUMIDITY
 
