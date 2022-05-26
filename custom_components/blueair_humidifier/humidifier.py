@@ -17,6 +17,7 @@ from homeassistant.components.humidifier import (
   SUPPORT_MODES,
   PLATFORM_SCHEMA,
   HumidifierEntity,
+  HumidifierEntityFeature
 )
 from homeassistant.const import (
   CONF_NAME,
@@ -99,6 +100,11 @@ class BlueairAirPurifier(HumidifierEntity):
     self._start_delta = start_delta
 
     self._stop_delta = stop_delta
+    
+    self._available_modes = ["MODE_NORMAL", "MODE_BOOST", "MODE_AUTO", "MODE_SLEEP"]
+    self._mode = "MODE_AUTO"
+
+    self._supported_features = HumidifierEntityFeature.MODES
 
     # To cheack if the switch state change if fired by the platform
     self._self_changed_switch = False
@@ -196,7 +202,7 @@ class BlueairAirPurifier(HumidifierEntity):
 
   async def async_set_mode(self, mode):
     """Set new target preset mode."""
-    self.mode = mode
+    self._mode = mode
 
   def available_modes(self) -> list[str] or None:
     """Return a list of available modes.
