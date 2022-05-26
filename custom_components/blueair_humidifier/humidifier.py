@@ -190,4 +190,18 @@ class BlueairAirPurifier(HumidifierEntity):
     _LOGGER.debug('turn_off')
     self._is_on = False
 
+  def set_mode(self, mode):
+    """Set new target preset mode."""
+    self._mode = mode
+
+  async def async_set_mode(self, mode):
+    """Set new target preset mode."""
+    self.mode = mode
+
+  def available_modes(self) -> list[str] or None:
+    """Return a list of available modes.
+    Requires HumidifierEntityFeature.MODES.
+    """
+    return ["MODE_NORMAL", "MODE_BOOST", "MODE_AUTO", "MODE_SLEEP"]
+
   ############################################################
