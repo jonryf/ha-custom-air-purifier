@@ -189,6 +189,11 @@ class BlueairAirPurifier(HumidifierEntity):
     _LOGGER.debug('device_class')
     return self._device_class
 
+  @property
+  def mode(self) -> str:
+    """Return current mode."""
+    return self._mode
+
   def set_humidity(self, humidity):
     """Set target humidity."""
     _LOGGER.debug('set_humidity')
