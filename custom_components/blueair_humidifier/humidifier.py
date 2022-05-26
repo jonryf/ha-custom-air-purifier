@@ -110,6 +110,7 @@ class BlueairAirPurifier(HumidifierEntity):
     self._stop_delta = stop_delta
     
     self._available_modes = ["MODE_NORMAL", "MODE_BOOST", "MODE_AUTO", "MODE_SLEEP"]
+    self._attr_mode = "MODE_AUTO"
     self._mode = "MODE_AUTO"
 
     self._supported_features = HumidifierEntityFeature.MODES
@@ -207,10 +208,13 @@ class BlueairAirPurifier(HumidifierEntity):
   def set_mode(self, mode):
     """Set new target preset mode."""
     self._mode = mode
+    self._attr_mode = mode
 
   async def async_set_mode(self, mode):
     """Set new target preset mode."""
     self._mode = mode
+    self._attr_mode = mode
+
 
   def available_modes(self) -> list[str] or None:
     """Return a list of available modes.
