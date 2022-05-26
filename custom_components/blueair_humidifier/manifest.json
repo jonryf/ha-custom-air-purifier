@@ -1,0 +1,7 @@
+{
+  "domain": "blueair_air_purifier",
+  "name": "Blueair Air Purifier",
+  "requirements": [],
+  "codeowners": ["jonryf"],
+  "version": "1.0.0.0"
+}
