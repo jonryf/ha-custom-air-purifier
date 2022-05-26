@@ -29,9 +29,9 @@ from homeassistant.const import (
 )
 
 import homeassistant.helpers.config_validation as cv
-from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL
+from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL, MODE_BOOST, MODE_SLEEP
 
-AVAILABLE_MODES = [MODE_NORMAL, MODE_AUTO]
+AVAILABLE_MODES = [MODE_NORMAL, MODE_AUTO, MODE_SLEEP, MODE_BOOST]
 
 SUPPORTED_FEATURES = SUPPORT_MODES
 
