@@ -202,15 +202,15 @@ class BlueairAirPurifier(HumidifierEntity):
       if(self._is_on):
         self.mode(MODE_AUTO)
     elif humidity > 0 and humidity <= 25:
-      self.target_humidity = 20
+      self._target_humidity = 20
       if(self._is_on):
         self.mode(MODE_SLEEP)
     elif humidity > 25 and humidity <= 75:
-      self.target_humidity = 50
+      self._target_humidity = 50
       if(self._is_on):
         self.mode(MODE_NORMAL)
     elif humidity > 75:
-      self.target_humidity = 100
+      self._target_humidity = 100
       if(self._is_on):
         self.mode(MODE_BOOST)
     self.save_target()
@@ -219,13 +219,13 @@ class BlueairAirPurifier(HumidifierEntity):
     """Turn the device ON."""
     _LOGGER.debug('turn_on')
     self._is_on = True
-    if self.target_humidity is 0:
+    if self._target_humidity is 0:
       self.mode(MODE_AUTO)
-    elif self.target_humidity > 0 and self.target_humidity <= 25:
+    elif self._target_humidity > 0 and self._target_humidity <= 25:
       self.mode(MODE_SLEEP)
-    elif self.target_humidity > 25 and self.target_humidity <= 75:
+    elif self._target_humidity > 25 and self._target_humidity <= 75:
       self.mode(MODE_NORMAL)
-    elif self.target_humidity > 75:
+    elif self._target_humidity > 75:
       self.mode(MODE_BOOST)
 
   def turn_off(self, **kwargs):
