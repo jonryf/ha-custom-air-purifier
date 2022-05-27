@@ -157,7 +157,7 @@ class BlueairAirPurifier(HumidifierEntity):
   @property
   def name(self):
     """Return the name of the humidifier."""
-    return self._name + " - MODE: " + self._mode
+    return self._name
 
   @property
   def target_humidity(self):
