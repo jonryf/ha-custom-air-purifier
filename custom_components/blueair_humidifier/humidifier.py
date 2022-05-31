@@ -29,7 +29,7 @@ from homeassistant.const import (
 )
 
 import homeassistant.helpers.config_validation as cv
-from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL, MODE_BOOST, MODE_SLEEP
+from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL, MODE_BOOST, MODE_SLEEP, MODE_AWAY
 
 AVAILABLE_MODES = [MODE_NORMAL, MODE_AUTO, MODE_SLEEP, MODE_BOOST]
 
@@ -227,6 +227,7 @@ class BlueairAirPurifier(HumidifierEntity):
   def turn_off(self, **kwargs):
     """Turn the device OFF."""
     _LOGGER.debug('turn_off')
+    self.set_mode(MODE_AWAY)
     self._is_on = False
 
   def set_mode(self, mode):
