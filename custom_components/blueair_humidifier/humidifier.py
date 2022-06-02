@@ -294,6 +294,8 @@ class BlueairAirPurifier(HumidifierEntity):
     else:
       self.step(bot)
     new_state = self.get_next_state(from_state)
+    if new_state == to_state:
+      return
     self.next_state(new_state, to_state, bot)
   
 
