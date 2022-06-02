@@ -247,16 +247,19 @@ class BlueairAirPurifier(HumidifierEntity):
 
   async def async_set_mode(self, mode):
     """Set new target preset mode."""
+    current_mode = self._mode
     self._mode = mode
     self._attr_mode = mode
+    self.from_state_to(current_mode, mode)
 
 
-  async def step_from_off(self, bot: Switchbot, count=0):
+
+  def step_from_off(self, bot: Switchbot, count=0):
     bot.press()
     self.last_press = time.time()
 
 
-  async def step(self, bot: Switchbot, count=0):
+  def step(self, bot: Switchbot, count=0):
     if time.time - self.last_press < 2500:
       bot.press()
       if time.time() - self.last_press > 4800:
@@ -278,13 +281,13 @@ class BlueairAirPurifier(HumidifierEntity):
       self.step(bot, count=count+1)
 
   
-  async def from_state_to(self, from_state: str, to_state: str):
+  def from_state_to(self, from_state: str, to_state: str):
     _LOGGER.warning('Set mode to' + from_state + " to " + to_state)
     bot: Switchbot = GetSwitchbotDevices().get_bots().values[0]
     _LOGGER.warning(bot)
     self.next_state(from_state, to_state, bot)
 
-  async def next_state(self, from_state: str, to_state: str, bot: Switchbot):
+  def next_state(self, from_state: str, to_state: str, bot: Switchbot):
     if from_state == "away":
       self.step_from_off()
     else:
