@@ -290,7 +290,7 @@ class BlueairAirPurifier(HumidifierEntity):
 
   def next_state(self, from_state: str, to_state: str, bot: Switchbot):
     if from_state == "away":
-      self.step_from_off()
+      self.step_from_off(bot)
     else:
       self.step(bot)
     new_state = self.get_next_state(from_state)
