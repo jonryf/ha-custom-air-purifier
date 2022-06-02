@@ -2,6 +2,10 @@
 import logging
 import json
 import os
+import time
+
+import asyncio
+
 
 import voluptuous as vol
 
@@ -27,6 +31,9 @@ from homeassistant.const import (
   STATE_ON,
   STATE_OFF
 )
+
+from switchbot import Switchbot, GetSwitchbotDevices  # pylint: disable=import-error
+
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL, MODE_BOOST, MODE_SLEEP, MODE_AWAY
@@ -93,6 +100,7 @@ class BlueairAirPurifier(HumidifierEntity):
 	
   def __init__(self, name, device_class, start_delta, stop_delta):
     """Initialize the humidifier."""
+    self.last_press = 0
 
     self._attr_available_modes = AVAILABLE_MODES
 
@@ -232,12 +240,53 @@ class BlueairAirPurifier(HumidifierEntity):
 
   def set_mode(self, mode):
     """Set new target preset mode."""
+    current_mode = self._mode
     self._mode = mode
     self._attr_mode = mode
+    self.from_state_to(current_mode, mode)
 
   async def async_set_mode(self, mode):
     """Set new target preset mode."""
     self._mode = mode
     self._attr_mode = mode
+
+
+  async def step(self, bot: Switchbot, count=0):
+    if time.time - self.last_press < 3000:
+      bot.press()
+      self.last_press = time.time()
+    else:
+      if count > 4: # todo
+        return
+      time.sleep(max(0, min(3000, time.time - self.last_press)))
+      bot.press()
+      self.last_press = time.time()
+      self.step(bot, count=count+1)
+
+  
+  async def from_state_to(self, from_state: str, to_state: str):
+    _LOGGER.log('Set mode to' + from_state + " to " + to_state)
+    bot: Switchbot = GetSwitchbotDevices().get_bots().values[0]
+    _LOGGER.log(bot)
+    self.next_state(from_state, to_state, bot)
+
+  async def next_state(self, from_state: str, to_state: str, bot: Switchbot):
+    self.step(bot)
+    new_state = self.get_next_state(from_state)
+    self.next_state(new_state, to_state, bot)
+  
+
+  def get_next_state(self, from_state: str) -> str:
+    if from_state == "auto":
+      return "sleep"
+    elif from_state == "sleep":
+      return "normal"
+    elif from_state == "normal":
+      return "boost"
+    elif from_state == "boost":
+      return "away"
+    elif from_state == "away":
+      return "auto"
+
 
   ############################################################

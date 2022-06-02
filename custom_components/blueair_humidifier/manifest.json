@@ -1,7 +1,8 @@
 {
   "domain": "blueair_air_purifier",
   "name": "Blueair Air Purifier",
-  "requirements": [],
+  "requirements": ["PySwitchbot==0.13.3"],
   "codeowners": ["jonryf"],
-  "version": "1.0.2.0"
+  "iot_class": "local_polling",
+  "version": "2.0.0.0"
 }
