@@ -261,10 +261,12 @@ class BlueairAirPurifier(HumidifierEntity):
       bot.press()
       if time.time() - self.last_press > 4800:
         self.step(bot, count= count+1)
+        _LOGGER.warning("Restart mission")
       else:
         self.last_press = time.time()
     else:
       if count > 4: # todo
+        _LOGGER.warning("End mission")
         return
       
       # clear
@@ -277,9 +279,9 @@ class BlueairAirPurifier(HumidifierEntity):
 
   
   async def from_state_to(self, from_state: str, to_state: str):
-    _LOGGER.log('Set mode to' + from_state + " to " + to_state)
+    _LOGGER.warning('Set mode to' + from_state + " to " + to_state)
     bot: Switchbot = GetSwitchbotDevices().get_bots().values[0]
-    _LOGGER.log(bot)
+    _LOGGER.warning(bot)
     self.next_state(from_state, to_state, bot)
 
   async def next_state(self, from_state: str, to_state: str, bot: Switchbot):
