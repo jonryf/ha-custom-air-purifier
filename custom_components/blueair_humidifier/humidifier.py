@@ -251,14 +251,23 @@ class BlueairAirPurifier(HumidifierEntity):
     self._attr_mode = mode
 
 
+  async def step_from_off(self, bot: Switchbot, count=0):
+    bot.press()
+    self.last_press = time.time()
+
+
   async def step(self, bot: Switchbot, count=0):
-    if time.time - self.last_press < 3000:
+    if time.time - self.last_press < 2500:
       bot.press()
       self.last_press = time.time()
     else:
       if count > 4: # todo
         return
-      time.sleep(max(0, min(3000, time.time - self.last_press)))
+      
+      # clear
+      time.sleep(max(0, 5000 - (time.time - self.last_press)))
+
+      # press
       bot.press()
       self.last_press = time.time()
       self.step(bot, count=count+1)
@@ -271,7 +280,10 @@ class BlueairAirPurifier(HumidifierEntity):
     self.next_state(from_state, to_state, bot)
 
   async def next_state(self, from_state: str, to_state: str, bot: Switchbot):
-    self.step(bot)
+    if from_state == "away":
+      self.step_from_off()
+    else:
+      self.step(bot)
     new_state = self.get_next_state(from_state)
     self.next_state(new_state, to_state, bot)
   
