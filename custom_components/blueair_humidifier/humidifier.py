@@ -260,7 +260,7 @@ class BlueairAirPurifier(HumidifierEntity):
 
 
   def step(self, bot: Switchbot, count=0):
-    if time.time - self.last_press < 2500:
+    if time.time() - self.last_press < 2500:
       bot.press()
       if time.time() - self.last_press > 4800:
         self.step(bot, count= count+1)
@@ -273,7 +273,7 @@ class BlueairAirPurifier(HumidifierEntity):
         return
       
       # clear
-      time.sleep(max(0, 5000 - (time.time - self.last_press)))
+      time.sleep(max(0, 5000 - (time.time() - self.last_press)))
 
       # press
       bot.press()
