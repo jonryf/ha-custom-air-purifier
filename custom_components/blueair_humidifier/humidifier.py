@@ -260,20 +260,24 @@ class BlueairAirPurifier(HumidifierEntity):
 
 
   def step(self, bot: Switchbot, count=0):
-    if time.time() - self.last_press < 2500:
+    if time.time() - self.last_press < 2.5:
+      # switch state
       bot.press()
-      if time.time() - self.last_press > 4800:
+      if time.time() - self.last_press > 4.8:
+        self.last_press = time.time()
         self.step(bot, count= count+1)
         _LOGGER.warning("Restart mission")
       else:
         self.last_press = time.time()
     else:
+      # activate 
+
       if count > 4: # todo
         _LOGGER.warning("End mission")
         return
       
       # clear
-      time.sleep(max(0, 5000 - (time.time() - self.last_press)))
+      time.sleep(max(0, 5.0 - (time.time() - self.last_press)))
 
       # press
       bot.press()
@@ -289,6 +293,7 @@ class BlueairAirPurifier(HumidifierEntity):
     self.next_state(from_state, to_state, bot)
 
   def next_state(self, from_state: str, to_state: str, bot: Switchbot):
+    _LOGGER.warning('Set_ mode to' + from_state + " to " + to_state)
     if from_state == "away":
       self.step_from_off(bot)
     else:
