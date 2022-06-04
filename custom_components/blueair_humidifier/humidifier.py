@@ -272,16 +272,17 @@ class BlueairAirPurifier(HumidifierEntity):
 
       if time.time() - self.last_press > 4.8:
         self.last_press = time.time()
-        self.step(bot, count= count+1)
         _LOGGER.warning("Restart mission")
+        return self.step(bot, count= count+1)
       else:
         self.last_press = time.time()
+        return True
     else:
       # activate 
 
       if count > 4: # todo
         _LOGGER.warning("End mission")
-        return
+        return False
       
       # clear
       time.sleep(max(0, 5.0 - (time.time() - self.last_press)))
@@ -289,7 +290,7 @@ class BlueairAirPurifier(HumidifierEntity):
       # press
       bot.press()
       self.last_press = time.time()
-      self.step(bot, count=count+1)
+      return self.step(bot, count=count+1)
 
   
   def from_state_to(self, from_state: str, to_state: str):
@@ -297,7 +298,7 @@ class BlueairAirPurifier(HumidifierEntity):
  #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
     bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
     _LOGGER.warning(bot)
-    self.next_state(from_state, to_state, bot)
+    return self.next_state(from_state, to_state, bot)
 
   def next_state(self, from_state: str, to_state: str, bot: Switchbot):
     _LOGGER.warning('Set_ mode to' + from_state + " to " + to_state)
@@ -306,11 +307,12 @@ class BlueairAirPurifier(HumidifierEntity):
     else:
       self.step(bot)
     new_state = self.get_next_state(from_state)
-    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state + str(new_state == to_state))
+    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state+ str(new_state == to_state))
 
     if new_state == to_state:
-      return
-    self.next_state(new_state, to_state, bot)
+      _LOGGER.warning("Exit")
+      return True
+    return self.next_state(new_state, to_state, bot)
   
 
   def get_next_state(self, from_state: str) -> str:
