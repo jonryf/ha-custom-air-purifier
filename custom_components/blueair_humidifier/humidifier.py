@@ -205,7 +205,9 @@ class BlueairAirPurifier(HumidifierEntity):
   def set_humidity(self, humidity):
     """Set target humidity."""
     _LOGGER.debug('set_humidity')
-    if humidity is 0:
+    if not self.is_on:
+      self._mode = MODE_AWAY
+    elif humidity is 0:
       self._target_humidity = humidity
       self.set_mode(MODE_AUTO)
     elif humidity > 0 and humidity <= 25:
@@ -260,9 +262,14 @@ class BlueairAirPurifier(HumidifierEntity):
 
 
   def step(self, bot: Switchbot, count=0):
+    _LOGGER.warning("Step: " + str(count))
+
     if time.time() - self.last_press < 2.5:
       # switch state
+      
       bot.press()
+      _LOGGER.warning("Switch")
+
       if time.time() - self.last_press > 4.8:
         self.last_press = time.time()
         self.step(bot, count= count+1)
@@ -278,7 +285,7 @@ class BlueairAirPurifier(HumidifierEntity):
       
       # clear
       time.sleep(max(0, 5.0 - (time.time() - self.last_press)))
-
+      _LOGGER.warning("Activate state")
       # press
       bot.press()
       self.last_press = time.time()
@@ -299,6 +306,8 @@ class BlueairAirPurifier(HumidifierEntity):
     else:
       self.step(bot)
     new_state = self.get_next_state(from_state)
+    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state + str(new_state == to_state))
+
     if new_state == to_state:
       return
     self.next_state(new_state, to_state, bot)
