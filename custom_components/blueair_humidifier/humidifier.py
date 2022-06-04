@@ -290,9 +290,11 @@ class BlueairAirPurifier(HumidifierEntity):
       _LOGGER.warning("Switch")
 
       if not pressed:
+        if count > 4: # todo
+          return False
         return self.step(bot, count= count+1)
 
-      if time.time() - self.last_press > 4.8:
+      if time.time() - self.last_press > 5.1:
         self.last_press = time.time()
         _LOGGER.warning("Restart mission")
         return self.step(bot, count= count+1)
@@ -330,8 +332,10 @@ class BlueairAirPurifier(HumidifierEntity):
       self.step_from_off(bot)
     else:
       self.step(bot)
+    _LOGGER.warning("Next: " + from_state)
     new_state = self.get_next_state(from_state)
 #    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state + str(new_state == to_state))
+    _LOGGER.warning("New: " + new_state)
 
     if new_state == to_state:
       _LOGGER.warning("Exit " + new_state + " " + to_state)
