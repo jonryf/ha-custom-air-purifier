@@ -281,7 +281,7 @@ class BlueairAirPurifier(HumidifierEntity):
 
 
   def step(self, bot: Switchbot, count=0):
-    _LOGGER.warning("Step: " + str(count))
+    _LOGGER.warning("sleep " + str(count))
 
     if time.time() - self.last_press < 2.5:
       # switch state
@@ -320,14 +320,16 @@ class BlueairAirPurifier(HumidifierEntity):
 
   
   def from_state_to(self, from_state: str, to_state: str) -> bool:
-    _LOGGER.warning('Set mode to' + from_state + " to " + to_state)
+    _LOGGER.warning('Set mode from ' + from_state + " to " + to_state)
+    if from_state == to_state:
+      return True
  #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
     bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
     _LOGGER.warning(bot)
     return self.next_state(from_state, to_state, bot)
 
   def next_state(self, from_state: str, to_state: str, bot: Switchbot) -> bool:
-    _LOGGER.warning('Set_ mode to' + from_state + " to " + to_state)
+    _LOGGER.warning('Set_ mode from ' + from_state + " to " + to_state)
     if from_state == "away":
       self.step_from_off(bot)
     else:
