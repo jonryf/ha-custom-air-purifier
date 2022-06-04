@@ -207,17 +207,22 @@ class BlueairAirPurifier(HumidifierEntity):
     _LOGGER.debug('set_humidity')
     if not self.is_on:
       self._mode = MODE_AWAY
+      self.save_target()
     elif humidity is 0:
       self._target_humidity = humidity
+      self.save_target()
       self.set_mode(MODE_AUTO)
     elif humidity > 0 and humidity <= 25:
       self._target_humidity = 20
+      self.save_target()
       self.set_mode(MODE_SLEEP)
     elif humidity > 25 and humidity <= 75:
       self._target_humidity = 50
+      self.save_target()
       self.set_mode(MODE_NORMAL)
     elif humidity > 75:
       self._target_humidity = 100
+      self.save_target()
       self.set_mode(MODE_BOOST)
     self.save_target()
 
@@ -228,10 +233,16 @@ class BlueairAirPurifier(HumidifierEntity):
     if self._target_humidity is 0:
       self.set_mode(MODE_AUTO)
     elif self._target_humidity > 0 and self._target_humidity <= 25:
+      self._target_humidity = 20
+      self.save_target()
       self.set_mode(MODE_SLEEP)
     elif self._target_humidity > 25 and self._target_humidity <= 75:
+      self._target_humidity = 50
+      self.save_target()
       self.set_mode(MODE_NORMAL)
     elif self._target_humidity > 75:
+      self._target_humidity = 100
+      self.save_target()
       self.set_mode(MODE_BOOST)
 
   def turn_off(self, **kwargs):
@@ -245,6 +256,7 @@ class BlueairAirPurifier(HumidifierEntity):
     current_mode = self._mode
     self._mode = mode
     self._attr_mode = mode
+    self.save_target()
     self.from_state_to(current_mode, mode)
 
   async def async_set_mode(self, mode):
@@ -252,6 +264,7 @@ class BlueairAirPurifier(HumidifierEntity):
     current_mode = self._mode
     self._mode = mode
     self._attr_mode = mode
+    self.save_target()
     self.from_state_to(current_mode, mode)
 
 
@@ -285,7 +298,7 @@ class BlueairAirPurifier(HumidifierEntity):
         return False
       
       # clear
-      time.sleep(max(0, 5.0 - (time.time() - self.last_press)))
+      time.sleep(min(5, max(0, 5.0 - (time.time() - self.last_press))))
       _LOGGER.warning("Activate state")
       # press
       bot.press()
@@ -293,21 +306,21 @@ class BlueairAirPurifier(HumidifierEntity):
       return self.step(bot, count=count+1)
 
   
-  def from_state_to(self, from_state: str, to_state: str):
+  def from_state_to(self, from_state: str, to_state: str) -> bool:
     _LOGGER.warning('Set mode to' + from_state + " to " + to_state)
  #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
     bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
     _LOGGER.warning(bot)
     return self.next_state(from_state, to_state, bot)
 
-  def next_state(self, from_state: str, to_state: str, bot: Switchbot):
+  def next_state(self, from_state: str, to_state: str, bot: Switchbot) -> bool:
     _LOGGER.warning('Set_ mode to' + from_state + " to " + to_state)
     if from_state == "away":
       self.step_from_off(bot)
     else:
       self.step(bot)
     new_state = self.get_next_state(from_state)
-    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state+ str(new_state == to_state))
+#    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state + str(new_state == to_state))
 
     if new_state == to_state:
       _LOGGER.warning("Exit " + new_state + " " + to_state)
