@@ -62,10 +62,10 @@ TYPES = [
 ]
 
 DEFAULT_TYPE = HUMIDIFIER_TYPE
-DEFAULT_HUMIDITY = 50
+DEFAULT_HUMIDITY = 0
 DEFAULT_START_DELTA = 0.1
 DEFAULT_STOP_DELTA = 0.1
-DEFAULT_SWITCH_STATE = STATE_OFF
+DEFAULT_SWITCH_STATE = STATE_ON
 MIN_HUMIDITY = 0
 MAX_HUMIDITY = 100
 
@@ -269,9 +269,15 @@ class BlueairAirPurifier(HumidifierEntity):
 
 
 
-  def step_from_off(self, bot: Switchbot, count=0):
-    bot.press()
-    self.last_press = time.time()
+  def step_from_off(self, bot: Switchbot, count=0) -> bool:
+    if bot.press():
+      self.last_press = time.time()
+      return True
+    else:
+      if count > 4:
+        return False
+      self.step_from_off(bot, count=count + 1)
+
 
 
   def step(self, bot: Switchbot, count=0):
@@ -280,8 +286,11 @@ class BlueairAirPurifier(HumidifierEntity):
     if time.time() - self.last_press < 2.5:
       # switch state
       
-      bot.press()
+      pressed = bot.press()
       _LOGGER.warning("Switch")
+
+      if not pressed:
+        return self.step(bot, count= count+1)
 
       if time.time() - self.last_press > 4.8:
         self.last_press = time.time()
@@ -298,11 +307,13 @@ class BlueairAirPurifier(HumidifierEntity):
         return False
       
       # clear
+      _LOGGER.warning("SLEEP: " + str(min(5, max(0, 5.0 - (time.time() - self.last_press)))))
       time.sleep(min(5, max(0, 5.0 - (time.time() - self.last_press))))
       _LOGGER.warning("Activate state")
       # press
-      bot.press()
-      self.last_press = time.time()
+      pressed = bot.press()
+      if pressed:
+        self.last_press = time.time()
       return self.step(bot, count=count+1)
 
   
