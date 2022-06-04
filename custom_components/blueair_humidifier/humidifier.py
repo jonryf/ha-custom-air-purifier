@@ -310,7 +310,7 @@ class BlueairAirPurifier(HumidifierEntity):
     _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state+ str(new_state == to_state))
 
     if new_state == to_state:
-      _LOGGER.warning("Exit")
+      _LOGGER.warning("Exit " + new_state + " " + to_state)
       return True
     return self.next_state(new_state, to_state, bot)
   
