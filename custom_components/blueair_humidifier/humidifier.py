@@ -101,6 +101,8 @@ class BlueairAirPurifier(HumidifierEntity):
   def __init__(self, name, device_class, start_delta, stop_delta):
     """Initialize the humidifier."""
     self.last_press = 0
+    self.is_working = False
+    self.next_mode = MODE_AUTO
 
     self._attr_available_modes = AVAILABLE_MODES
 
@@ -257,7 +259,9 @@ class BlueairAirPurifier(HumidifierEntity):
     self._mode = mode
     self._attr_mode = mode
     self.save_target()
-    self.from_state_to(current_mode, mode)
+    self.next_mode = mode
+    if not self.is_working:
+      self.from_state_to(current_mode, mode)
 
   async def async_set_mode(self, mode):
     """Set new target preset mode."""
@@ -265,7 +269,9 @@ class BlueairAirPurifier(HumidifierEntity):
     self._mode = mode
     self._attr_mode = mode
     self.save_target()
-    self.from_state_to(current_mode, mode)
+    self.next_mode = mode
+    if not self.is_working:
+      self.from_state_to(current_mode, mode)
 
 
 
@@ -320,6 +326,7 @@ class BlueairAirPurifier(HumidifierEntity):
 
   
   def from_state_to(self, from_state: str, to_state: str) -> bool:
+    self.is_working = True
     _LOGGER.warning('Set mode from ' + from_state + " to " + to_state)
     if from_state == to_state:
       return True
@@ -328,8 +335,8 @@ class BlueairAirPurifier(HumidifierEntity):
     _LOGGER.warning(bot)
     return self.next_state(from_state, to_state, bot)
 
-  def next_state(self, from_state: str, to_state: str, bot: Switchbot) -> bool:
-    _LOGGER.warning('Set_ mode from ' + from_state + " to " + to_state)
+  def next_state(self, from_state: str, bot: Switchbot) -> bool:
+    _LOGGER.warning('Set_ mode from ' + from_state + " to " + self.next_mode)
     if from_state == "away":
       self.step_from_off(bot)
     else:
@@ -339,10 +346,11 @@ class BlueairAirPurifier(HumidifierEntity):
 #    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state + str(new_state == to_state))
     _LOGGER.warning("New: " + new_state)
 
-    if new_state == to_state:
-      _LOGGER.warning("Exit " + new_state + " " + to_state)
+    if new_state == self.next_mode:
+      _LOGGER.warning("Exit " + new_state + " " + self.next_mode)
+      self.is_working = False
       return True
-    return self.next_state(new_state, to_state, bot)
+    return self.next_state(new_state, bot)
   
 
   def get_next_state(self, from_state: str) -> str:
