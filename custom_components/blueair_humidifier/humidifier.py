@@ -347,8 +347,8 @@ class BlueairAirPurifier(HumidifierEntity):
     _LOGGER.warning("New: " + new_state)
 
     if new_state == self.next_mode:
-      _LOGGER.warning("Exit " + new_state + " " + self.next_mode)
       self.is_working = False
+      _LOGGER.warning("Exit " + new_state + " " + self.next_mode)
       return True
     return self.next_state(new_state, bot)
   
