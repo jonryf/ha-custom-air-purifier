@@ -275,35 +275,35 @@ class BlueairAirPurifier(HumidifierEntity):
 
 
 
-  def step_from_off(self, bot: Switchbot, count=0) -> bool:
-    if bot.press():
+  async def step_from_off(self, bot: Switchbot, count=0) -> bool:
+    if await bot.press():
       self.last_press = time.time()
       return True
     else:
       if count > 4:
         return False
-      self.step_from_off(bot, count=count + 1)
+      await self.step_from_off(bot, count=count + 1)
 
 
 
-  def step(self, bot: Switchbot, count=0):
+  async def step(self, bot: Switchbot, count=0):
     _LOGGER.warning("sleep " + str(count))
 
     if time.time() - self.last_press < 2.5:
       # switch state
       
-      pressed = bot.press()
+      pressed = await bot.press()
       _LOGGER.warning("Switch")
 
       if not pressed:
         if count > 4: # todo
           return False
-        return self.step(bot, count= count+1)
+        return await self.step(bot, count= count+1)
 
       if time.time() - self.last_press > 5.1:
         self.last_press = time.time()
         _LOGGER.warning("Restart mission")
-        return self.step(bot, count= count+1)
+        return await self.step(bot, count= count+1)
       else:
         self.last_press = time.time()
         return True
@@ -319,10 +319,10 @@ class BlueairAirPurifier(HumidifierEntity):
       time.sleep(min(5, max(0, 5.0 - (time.time() - self.last_press))))
       _LOGGER.warning("Activate state")
       # press
-      pressed = bot.press()
+      pressed = await bot.press()
       if pressed:
         self.last_press = time.time()
-      return self.step(bot, count=count+1)
+      return await self.step(bot, count=count+1)
 
   
   def from_state_to(self, from_state: str, to_state: str) -> bool:
@@ -338,9 +338,9 @@ class BlueairAirPurifier(HumidifierEntity):
   def next_state(self, from_state: str, bot: Switchbot) -> bool:
     _LOGGER.warning('Set_ mode from ' + from_state + " to " + self.next_mode)
     if from_state == "away":
-      self.step_from_off(bot)
+      asyncio.run(self.step_from_off(bot))
     else:
-      self.step(bot)
+      asyncio.run(self.step(bot))
     _LOGGER.warning("Next: " + from_state)
     new_state = self.get_next_state(from_state)
 #    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state + str(new_state == to_state))
