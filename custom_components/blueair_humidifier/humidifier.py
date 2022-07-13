@@ -268,6 +268,7 @@ class BlueairAirPurifier(HumidifierEntity):
     self._attr_mode = mode
     self.save_target()
     self.next_mode = mode
+    _LOGGER.warning("Called from sync")
     if not self.is_working:
       asyncio.run(self.from_state_to(current_mode, mode))
 
@@ -278,6 +279,7 @@ class BlueairAirPurifier(HumidifierEntity):
     self._attr_mode = mode
     self.save_target()
     self.next_mode = mode
+    _LOGGER.warning("Called from async")
     if not self.is_working:
       await self.from_state_to(current_mode, mode)
 
@@ -293,6 +295,7 @@ class BlueairAirPurifier(HumidifierEntity):
       await self.step_from_off(count=count + 1)
 
   async def press():
+    _LOGGER.warning("Pressed")
     await hass_instance.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
