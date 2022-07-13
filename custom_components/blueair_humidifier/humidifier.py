@@ -11,7 +11,7 @@ import voluptuous as vol
 
 from homeassistant.core import callback
 from homeassistant.helpers.event import track_state_change, async_track_state_change_event
-
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.components.humidifier import (
   ATTR_HUMIDITY,
   ATTR_MAX_HUMIDITY,
@@ -29,8 +29,15 @@ from homeassistant.const import (
   SERVICE_TURN_OFF,
   SERVICE_TOGGLE,
   STATE_ON,
-  STATE_OFF
+  STATE_OFF,
+  ATTR_ENTITY_ID,
+  SERVICE_TURN_OFF,
+  SERVICE_TURN_ON,
+  STATE_OFF,
+  STATE_ON,
+  STATE_UNAVAILABLE
 )
+from homeassistant.helpers import entity_registry as er
 
 from switchbot import Switchbot, GetSwitchbotDevices  # pylint: disable=import-error
 
@@ -78,6 +85,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
   }
 )
 
+hass_instance = None
+
 def setup_platform(hass, config, add_entities, discovery_info=None):
   """Set up the dehumidifier platform."""
   name = config[CONF_NAME]
@@ -91,6 +100,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
   devices.append(switchHumidifier)
   add_entities(devices, True)
 
+  hass_instance = hass
   # Track sensor or switch state changes.
   # track_state_change(hass, [], switchHumidifier._state_changed)
 
@@ -284,6 +294,15 @@ class BlueairAirPurifier(HumidifierEntity):
         return False
       await self.step_from_off(bot, count=count + 1)
 
+  async def press():
+    await hass_instance.services.async_call(
+            SWITCH_DOMAIN,
+            SERVICE_TURN_ON,
+            {ATTR_ENTITY_ID: "switch.blueair_switch"},
+            blocking=True,
+    )
+    await hass_instance.async_block_till_done()
+    return True
 
 
   async def step(self, bot: Switchbot, count=0):
