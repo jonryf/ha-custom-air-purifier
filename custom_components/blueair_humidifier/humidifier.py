@@ -344,7 +344,7 @@ class BlueairAirPurifier(HumidifierEntity):
       return await self.step(bot, count=count+1)
 
   
-  def from_state_to(self, from_state: str, to_state: str) -> bool:
+  async def from_state_to(self, from_state: str, to_state: str) -> bool:
     self.is_working = True
     _LOGGER.warning('Set mode from ' + from_state + " to " + to_state)
     if from_state == to_state:
@@ -352,9 +352,9 @@ class BlueairAirPurifier(HumidifierEntity):
  #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
     bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
     _LOGGER.warning(bot)
-    return self.next_state(from_state, bot)
+    return await self.next_state(from_state, bot)
 
-  def next_state(self, from_state: str, bot: Switchbot) -> bool:
+  async def next_state(self, from_state: str, bot: Switchbot) -> bool:
     _LOGGER.warning('Set_ mode from ' + from_state + " to " + self.next_mode)
     if from_state == "away":
       self.step_from_off(bot)
@@ -369,7 +369,7 @@ class BlueairAirPurifier(HumidifierEntity):
       self.is_working = False
       _LOGGER.warning("Exit " + new_state + " " + self.next_mode)
       return True
-    return self.next_state(new_state, bot)
+    return await self.next_state(new_state, bot)
   
 
   def get_next_state(self, from_state: str) -> str:
