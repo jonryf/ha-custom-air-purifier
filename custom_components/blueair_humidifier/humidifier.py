@@ -296,13 +296,13 @@ class BlueairAirPurifier(HumidifierEntity):
 
   async def press(self):
     _LOGGER.warning("Pressed")
-    await hass_instance.services.async_call(
+    await self.hass.services.async_call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
             {ATTR_ENTITY_ID: "switch.blueair_switch"},
             blocking=True,
     )
-    await hass_instance.async_block_till_done()
+    await self.hass.async_block_till_done()
     return True
 
 
