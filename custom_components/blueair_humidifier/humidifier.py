@@ -350,7 +350,7 @@ class BlueairAirPurifier(HumidifierEntity):
  #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
     #bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
    # _LOGGER.warning(bot)
-    return await self.next_state(from_state, None)
+    return await self.next_state(from_state)
 
   async def next_state(self, from_state: str) -> bool:
     _LOGGER.warning('Set_ mode from ' + from_state + " to " + self.next_mode)
