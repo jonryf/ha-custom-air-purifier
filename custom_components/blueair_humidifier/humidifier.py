@@ -294,7 +294,7 @@ class BlueairAirPurifier(HumidifierEntity):
         return False
       await self.step_from_off(count=count + 1)
 
-  async def press():
+  async def press(self):
     _LOGGER.warning("Pressed")
     await hass_instance.services.async_call(
             SWITCH_DOMAIN,
