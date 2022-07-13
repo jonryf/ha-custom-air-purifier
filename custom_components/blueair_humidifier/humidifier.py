@@ -39,8 +39,6 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import entity_registry as er
 
-from switchbot import Switchbot, GetSwitchbotDevices  # pylint: disable=import-error
-
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.humidifier.const import MODE_AUTO, MODE_NORMAL, MODE_BOOST, MODE_SLEEP, MODE_AWAY
@@ -281,18 +279,18 @@ class BlueairAirPurifier(HumidifierEntity):
     self.save_target()
     self.next_mode = mode
     if not self.is_working:
-      self.from_state_to(current_mode, mode)
+      await self.from_state_to(current_mode, mode)
 
 
 
-  async def step_from_off(self, bot: Switchbot, count=0) -> bool:
+  async def step_from_off(self, count=0) -> bool:
     if await self.press():
       self.last_press = time.time()
       return True
     else:
       if count > 4:
         return False
-      await self.step_from_off(bot, count=count + 1)
+      await self.step_from_off(count=count + 1)
 
   async def press():
     await hass_instance.services.async_call(
@@ -305,7 +303,7 @@ class BlueairAirPurifier(HumidifierEntity):
     return True
 
 
-  async def step(self, bot: Switchbot, count=0):
+  async def step(self, count=0):
     _LOGGER.warning("sleep " + str(count))
 
     if time.time() - self.last_press < 2.5:
@@ -317,12 +315,12 @@ class BlueairAirPurifier(HumidifierEntity):
       if not pressed:
         if count > 4: # todo
           return False
-        return await self.step(bot, count= count+1)
+        return await self.step(count= count+1)
 
       if time.time() - self.last_press > 5.1:
         self.last_press = time.time()
         _LOGGER.warning("Restart mission")
-        return await self.step(bot, count= count+1)
+        return await self.step(count= count+1)
       else:
         self.last_press = time.time()
         return True
@@ -341,7 +339,7 @@ class BlueairAirPurifier(HumidifierEntity):
       pressed = await self.press()
       if pressed:
         self.last_press = time.time()
-      return await self.step(bot, count=count+1)
+      return await self.step(count=count+1)
 
   
   async def from_state_to(self, from_state: str, to_state: str) -> bool:
@@ -350,16 +348,16 @@ class BlueairAirPurifier(HumidifierEntity):
     if from_state == to_state:
       return True
  #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
-    bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
-    _LOGGER.warning(bot)
-    return await self.next_state(from_state, bot)
+    #bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
+   # _LOGGER.warning(bot)
+    return await self.next_state(from_state, None)
 
-  async def next_state(self, from_state: str, bot: Switchbot) -> bool:
+  async def next_state(self, from_state: str) -> bool:
     _LOGGER.warning('Set_ mode from ' + from_state + " to " + self.next_mode)
     if from_state == "away":
-      self.step_from_off(bot)
+      await self.step_from_off()
     else:
-      self.step(bot)
+      await self.step()
     _LOGGER.warning("Next: " + from_state)
     new_state = self.get_next_state(from_state)
 #    _LOGGER.warning('Rerun: ' + from_state + " to " + to_state  + " " + new_state + str(new_state == to_state))
@@ -369,7 +367,7 @@ class BlueairAirPurifier(HumidifierEntity):
       self.is_working = False
       _LOGGER.warning("Exit " + new_state + " " + self.next_mode)
       return True
-    return await self.next_state(new_state, bot)
+    return await self.next_state(new_state)
   
 
   def get_next_state(self, from_state: str) -> str:
