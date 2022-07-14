@@ -302,7 +302,7 @@ class BlueairAirPurifier(HumidifierEntity):
             {ATTR_ENTITY_ID: "switch.blueair_switch"},
             blocking=True,
     )
-    self.hass.services.block_till_done()
+    self.hass.block_till_done()
     return result
 
 
