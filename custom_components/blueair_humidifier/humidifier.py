@@ -296,13 +296,13 @@ class BlueairAirPurifier(HumidifierEntity):
 
   def press(self):
     _LOGGER.warning("Pressed")
-    self.hass.services.call(
+    result = self.hass.services.call(
             SWITCH_DOMAIN,
             SERVICE_TURN_ON,
             {ATTR_ENTITY_ID: "switch.blueair_switch"},
             blocking=True,
     )
-    return True
+    return result
 
 
   def step(self, count=0):
@@ -337,8 +337,8 @@ class BlueairAirPurifier(HumidifierEntity):
         return False
       
       # clear
-      _LOGGER.warning("SLEEP: " + str(min(5, max(0, 5.0 - (time.time() - self.last_press)))))
-      time.sleep(min(5, max(0, 5.0 - (time.time() - self.last_press))))
+      _LOGGER.warning("SLEEP: " + str(min(5.5, max(0, 5.5 - (time.time() - self.last_press)))))
+      time.sleep(min(5.5, max(0, 5.5 - (time.time() - self.last_press))))
       _LOGGER.warning("Activate state")
       # press
       pressed = self.press()
@@ -351,10 +351,9 @@ class BlueairAirPurifier(HumidifierEntity):
     self.is_working = True
     _LOGGER.warning('Set mode from ' + from_state + " to " + to_state)
     if from_state == to_state:
+      self.is_working = False
       return True
- #   _LOGGER.warning(GetSwitchbotDevices().get_bots())
-    #bot: Switchbot = Switchbot(mac="c0:fd:37:e2:2f:ad")
-   # _LOGGER.warning(bot)
+
     return self.next_state(from_state)
 
   def next_state(self, from_state: str) -> bool:
