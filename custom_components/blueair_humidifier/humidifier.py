@@ -308,6 +308,9 @@ class BlueairAirPurifier(HumidifierEntity):
   def step(self, count=0):
     _LOGGER.warning("sleep " + str(count))
 
+    if time.time() - self.last_press < 1.5:
+      time.sleep(1.5-(time.time() - self.last_press))
+
     if time.time() - self.last_press < 2.5:
       # switch state
       
