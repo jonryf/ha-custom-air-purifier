@@ -302,14 +302,15 @@ class BlueairAirPurifier(HumidifierEntity):
             {ATTR_ENTITY_ID: "switch.blueair_switch"},
             blocking=True,
     )
+    self.hass.services.block_till_done()
     return result
 
 
   def step(self, count=0):
     _LOGGER.warning("sleep " + str(count))
 
-    if time.time() - self.last_press < 2.0:
-      time.sleep(2.0-(time.time() - self.last_press))
+    #if time.time() - self.last_press < 2.0:
+    #  time.sleep(2.0-(time.time() - self.last_press))
 
     if time.time() - self.last_press < 2.5:
       # switch state
